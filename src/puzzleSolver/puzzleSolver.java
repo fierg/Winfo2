@@ -1,6 +1,7 @@
 package puzzleSolver;
 
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -33,15 +34,18 @@ public class puzzleSolver {
 		StringTokenizer toki = new StringTokenizer(args[0], ",");
 		int[][] tiles = new int[3][3];
 		try {
-			for (int i = 0; i < 9; i++) {
-				tiles[i / 3][i % 3] = Integer.parseInt(toki.nextToken());
+			for (int i = 0; i < 3; i++) {
+				for(int j = 0; j < 3; j++){
+					tiles[i][j] = Integer.parseInt(toki.nextToken());
+				}
 			}
 		} catch (NumberFormatException e){
 			//check args
 			printUsage();
 		}
 		puzzle = new Puzzle(tiles);
-		puzzle.printPuzzle(); //print once for the start state
+		puzzle.printPuzzle("Solvable: " + puzzle.isSolvable()); //print once for the start state
+
 		try {
 			switch(Integer.parseInt(args[1])){
 				//Switch the Algorithm argument and solve accordingly
@@ -65,7 +69,10 @@ public class puzzleSolver {
 	 * @param printSteps the print steps
 	 */
 	private static void solve(SolvingStrategy strategy, int printSteps){
-		strategy.solve(puzzle, printSteps);
+		ArrayList<Puzzle> statesToSolution = strategy.solve(puzzle, printSteps);
+		for(Puzzle p : statesToSolution){
+			p.printPuzzle();
+		}
 	}
 
 	/**

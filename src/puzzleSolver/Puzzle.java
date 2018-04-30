@@ -11,23 +11,16 @@ public class Puzzle implements Heuristic {
 	// This is the final state we want to reach in order to solve the puzzle
 	public final static int[][] SOLUTION = { { 1, 2, 3 }, { 8, 0, 4 }, { 7, 6, 5 } };
 
-	/** The puzzle. */
-	// Saves the current state of the puzzle
-	int[][] puzzle;
-
-	/**
-	 * Instantiates a new puzzle.
-	 *
-	 * @param puzzle the puzzle
-	 */
-	public Puzzle(int[][] puzzle) {
-		this.puzzle = puzzle;
+	//Saves the current state of the puzzle
+	int [][] puzzle;
+	
+	public Puzzle(int[][] puzzle){
+		this.puzzle = puzzle;		
 	}
 
 	/**
 	 * Prints the puzzle.
 	 */
-	// prints the puzzle to console
 	public void printPuzzle() {
 		for (int i = 0; i < this.puzzle.length; i++) {
 			for (int j = 0; j < this.puzzle[i].length; j++) {
@@ -68,49 +61,49 @@ public class Puzzle implements Heuristic {
 	 *
 	 * @param x            the x coordinate
 	 * @param y            the y coordinate
-	 * @return returns true, if the tile was moved
+	 * @return returns the number of the moved tile, else -1
 	 */
-	public boolean moveTile(int x, int y) {
-		// check if tile is != 0
-		if (puzzle[y][x] == 0) {
-			return false;
+	public int moveTile(int x, int y){
+		//check if tile is != 0
+		if (puzzle[x][y] == 0) {
+			return -1;
 		}
-		// check for array bounds:
-		if (x < 0 || y < 0 || x > puzzle.length || y > puzzle.length) {
-			return false;
+		//check for array bounds:
+		if(x < 0 || y < 0 || x > puzzle.length || y > puzzle.length){
+			return -1;
 		} else {
-			int xl, xr, yt, yb; // Variables for xleft, xright, ytop, ybottom
-			// Check if an index would be out of bounds
-			// If yes, put that index to the tile we want to move because
-			// this won't throw an exception when reading puzzle[x][y]
-			// and won't swap, because the tile itself isn't 0
-			xl = Math.max(x - 1, 0);
-			xr = Math.min(x + 1, puzzle.length);
-			yt = Math.max(y - 1, 0);
-			yb = Math.min(y + 1, puzzle.length);
+            int xl, xr, yt, yb; //Variables for xleft, xright, ytop, ybottom
+            //Check if an index would be out of bounds
+            //If yes, put that index to the tile we want to move because
+            //this won't throw an exception when reading puzzle[x][y]
+            //and won't swap, because the tile itself isn't 0
+            xl = Math.max(x - 1, 0);
+            xr = Math.min(x + 1, puzzle.length - 1);
+            yt = Math.max(y - 1, 0);
+            yb = Math.min(y + 1, puzzle.length - 1);
 
-			// check if 0 is the Neighbourtile:
-			if (puzzle[yt][x] == 0) {
-				swap(x, y, x, yt);
-				return true;
-			} else if (puzzle[y][xl] == 0) {
-				swap(x, y, xl, y);
-				return true;
-			} else if (puzzle[y][xr] == 0) {
-				swap(x, y, xr, y);
-				return true;
-			} else if (puzzle[yb][x] == 0) {
-				swap(x, y, x, yb);
-				return true;
-			}
-		}
-		return false;
+            //check if 0 is the Neighbourtile:
+            if (puzzle[x][yt] == 0) {
+                swap(x, y, x, yt);
+                return puzzle[x][yt];
+            } else if (puzzle[xl][y] == 0) {
+                swap(x, y, xl, y);
+                return puzzle[xl][y];
+            } else if (puzzle[xr][y] == 0) {
+                swap(x, y, xr, y);
+                return puzzle[xr][y];
+            } else if (puzzle[x][yb] == 0) {
+                swap(x, y, x, yb);
+                return puzzle[x][yb];
+            }
+        }
+        return -1;
 	}
 
 	/**
 	 * swaps two Tiles. Doesn't check if one of them is 0 or out of bounds, use
 	 * moveTile() for public usage
-	 * 
+	 *
 	 * @param x
 	 *            the x coordinate to be swapped
 	 * @param y
@@ -121,9 +114,9 @@ public class Puzzle implements Heuristic {
 	 *            the y coordinate to swap with
 	 */
 	private void swap(int x, int y, int x2, int y2) {
-		int tmp = puzzle[y][x];
-		puzzle[y][x] = puzzle[y2][x2];
-		puzzle[y2][x2] = tmp;
+		int tmp = puzzle[x][y];
+		puzzle[x][y] = puzzle[x2][y2];
+		puzzle[x2][y2] = tmp;
 	}
 
 	/**
@@ -141,6 +134,27 @@ public class Puzzle implements Heuristic {
 			}
 		}
 		return count;
+	}
+
+	public boolean equals(Puzzle other) {
+		boolean isEqual = true;
+		for(int i = 0; i < 3; i++){
+			for(int j = 0; j < 3; j++){
+				if(this.puzzle[i][j] != (other.puzzle[i][j])){
+					isEqual = false;
+					return isEqual;
+				}
+			}
+		}
+		return isEqual;
+	}
+
+	public Puzzle copy(){
+		int[][] tiles = new int[3][3];
+		for(int i = 0; i < 3; i++){
+			tiles[i] = puzzle[i].clone();
+		}
+		return new Puzzle(tiles);
 	}
 
 	/**
