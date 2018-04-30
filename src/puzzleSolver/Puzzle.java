@@ -5,7 +5,7 @@ import java.awt.Point;
 /**
  * The Class Puzzle.
  */
-public class Puzzle {
+public class Puzzle implements Heuristic {
 
 	/** The Constant SOLUTION. */
 	// This is the final state we want to reach in order to solve the puzzle
@@ -165,7 +165,7 @@ public class Puzzle {
 	 * @param puzzle the puzzle
 	 * @return the point
 	 */
-	public Point getPoint(int tile, int[][] puzzle) {
+	private Point getPoint(int tile, int[][] puzzle) {
 		int collumn = 0;
 		int row = 0;
 		for (int[] col : puzzle) {
@@ -189,6 +189,17 @@ public class Puzzle {
 	 */
 	public boolean isSolved() {
 		return this.wrongTiles() == 0;
+	}
+
+	@Override
+	public int getH() {
+		int sum = 0;
+		for (int[] is : puzzle) {
+			for (int i : is) {
+				sum += manhattanDist(i, puzzle, i);
+			}
+		}
+		return sum;
 	}
 
 }
