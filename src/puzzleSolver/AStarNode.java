@@ -1,22 +1,22 @@
 package puzzleSolver;
 
-public class AStarNode implements Comparable<Object> {
+public class AStarNode<T extends Expendable> implements Comparable<Object> {
 
-	private Object NodeData;
+	private T NodeData;
 
 	private int g;
 
 	private int h;
 
-	public AStarNode(Object object) {
+	public AStarNode(T object) {
 		this.NodeData = object;
 	}
 
-	public Object getNodeData() {
+	public T getNodeData() {
 		return NodeData;
 	}
 
-	public void setNodeData(Object nodeData) {
+	public void setNodeData(T nodeData) {
 		NodeData = nodeData;
 	}
 
@@ -44,7 +44,8 @@ public class AStarNode implements Comparable<Object> {
 	@Override
 	public int compareTo(Object o) {
 		if(o instanceof AStarNode) {
-			AStarNode other = (AStarNode) o;
+			@SuppressWarnings("unchecked")
+			AStarNode<? extends Expendable> other = ((AStarNode<? extends Expendable>) o);
 			if(getF() > other.getF()) {
 				return -1;
 			} else if (getF() < other.getF()) {

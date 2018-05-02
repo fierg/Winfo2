@@ -1,11 +1,12 @@
 package puzzleSolver;
 
 import java.awt.Point;
+import java.util.List;
 
 /**
  * The Class Puzzle.
  */
-public class Puzzle implements Heuristic {
+public class Puzzle implements Heuristic , Expendable{
 
 	/** The Constant SOLUTION. */
 	// This is the final state we want to reach in order to solve the puzzle
@@ -214,6 +215,11 @@ public class Puzzle implements Heuristic {
 			}
 		}
 		return sum;
+	}
+
+	@Override
+	public List<Puzzle> expandNode() {
+		return null;
 	}
 
 }
