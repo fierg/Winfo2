@@ -1,5 +1,8 @@
 package puzzleSolver;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class AStarNode<T extends Expendable> implements Comparable<Object> {
 
 	private T NodeData;
@@ -7,6 +10,8 @@ public class AStarNode<T extends Expendable> implements Comparable<Object> {
 	private int g;
 
 	private int h;
+
+	AStarNode<Puzzle> parent;
 
 	public AStarNode(T object) {
 		this.NodeData = object;
@@ -20,10 +25,7 @@ public class AStarNode<T extends Expendable> implements Comparable<Object> {
 		NodeData = nodeData;
 	}
 
-	public int getG() {
-
-		return g;
-	}
+	public int getG() { return g; }
 
 	public int getF() {
 		return getG() + getH();
@@ -56,6 +58,31 @@ public class AStarNode<T extends Expendable> implements Comparable<Object> {
 		} else {
 			throw new IllegalArgumentException("Given Object not of type AStarNode!");
 		}
+	}
+
+	/**
+	 * creates all possible children (so all possible moves from this state) and appends them to the current node
+	 * @return an ArrayList of PuzzleNodes with all possible moves you can make
+	 */
+	public ArrayList<AStarNode<Puzzle>> createChildren(){
+		ArrayList<AStarNode<Puzzle>> children = new ArrayList<>();
+		for(int i = 0; i < 3; i++){
+			for(int j = 0; j < 3; j++){
+				//copy the puzzleState
+				Puzzle newPuzzle = ((Puzzle) NodeData).copy();
+				//try to move every tile (makeTile() handles invalid moves)
+				if(newPuzzle.moveTile(i, j) > 0){
+					//if a tile was moved, create a node with the newly created puzzleState
+					AStarNode<Puzzle> newChild = new AStarNode<Puzzle>(newPuzzle);
+					//set the parent
+					newChild.parent = (AStarNode<Puzzle>) this;
+					//and add it as child
+					children.add(newChild);
+				}
+			}
+		}
+		//return all new child, so the solver can keep working on them
+		return children;
 	}
 
 
