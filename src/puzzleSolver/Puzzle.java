@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * The Class Puzzle.
  */
-public class Puzzle implements Heuristic , Expendable{
+public class Puzzle {
 
 	/** The Constant SOLUTION. */
 	// This is the final state we want to reach in order to solve the puzzle
@@ -136,6 +136,14 @@ public class Puzzle implements Heuristic , Expendable{
 		}
 		return count;
 	}
+	/**
+	 * Checks whether the puzzle is solved.
+	 *
+	 * @return returns true if all tiles are in the same spot as the puzzle defined in the constant SOLUTION
+	 */
+	public boolean isSolved() {
+		return this.wrongTiles() == 0;
+	}
 
 	public boolean equals(Puzzle other) {
 		boolean isEqual = true;
@@ -196,17 +204,6 @@ public class Puzzle implements Heuristic , Expendable{
 		return null;
 	}
 
-	/**
-	 * Checks whether the puzzle is solved.
-	 *
-	 * @return returns true if all tiles are in the correct order
-	 *         (1,2,3,8,0,4,7,6,5)
-	 */
-	public boolean isSolved() {
-		return this.wrongTiles() == 0;
-	}
-
-	@Override
 	public int getH() {
 		int sum = 0;
 		for (int[] is : puzzle) {
@@ -215,11 +212,6 @@ public class Puzzle implements Heuristic , Expendable{
 			}
 		}
 		return sum;
-	}
-
-	@Override
-	public List<Puzzle> expandNode() {
-		return null;
 	}
 
 }

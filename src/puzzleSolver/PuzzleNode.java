@@ -10,7 +10,8 @@ import java.util.ArrayList;
  */
 public class PuzzleNode {
     Puzzle puzzleState;
-    int hn;
+    int hn, fn, gn;
+    int score;
     PuzzleNode parent;
 
     /**
@@ -37,6 +38,8 @@ public class PuzzleNode {
                     PuzzleNode newChild = new PuzzleNode(newPuzzle);
                     //set the parent
                     newChild.parent = this;
+                    //set the gn value
+                    newChild.gn = this.gn + 1;
                     //and add it as child
                     children.add(newChild);
                 }
@@ -57,10 +60,15 @@ public class PuzzleNode {
     }
 
     /**
-     * calculates the heuristic score of the current puzzleState
-     * for GreedySearch this is the amount of wrong tiles
+     * calculates the score of the current puzzleState
+     * assumes taht gn is already set, if A* is used
      */
-    public void determineHeuristic() {
-        hn = puzzleState.wrongTiles();
+    public void determineScore(int method){
+        switch(method){
+            case 1: score = hn = puzzleState.wrongTiles(); break;
+            case 2: hn = puzzleState.wrongTiles(); score = fn = hn + gn; break;
+            case 3: hn = puzzleState.getH(); score = fn = hn + gn; break;
+        }
     }
+
 }
