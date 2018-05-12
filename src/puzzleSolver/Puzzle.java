@@ -1,6 +1,7 @@
 package puzzleSolver;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -213,5 +214,44 @@ public class Puzzle {
 		}
 		return sum;
 	}
+	
+	public boolean isSolvable(int[][] puzzle, int[][] solution) {
+		if ((countInversions(puzzle) % 2 == 0 && countInversions(solution) % 2 == 0)
+				|| ((countInversions(puzzle) + 1) % 2 == 0 && (countInversions(solution) + 1) % 2 == 0)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public int countInversions(int[][] puzzle) {
+		int inversions = 0;
+		ArrayList<Integer> puzzleList = new ArrayList<>();
+		for (int[] row : puzzle) {
+			for (int i : row) {
+				puzzleList.add(i);
+			}
+		}
+		Integer[] puzzleArray = puzzleList.toArray(new Integer[puzzleList.size()]);
+
+		for (int i = 0; i < puzzleArray.length; i++) {
+			if (puzzleArray[i] == 0) {
+				continue;
+			}
+
+			for (int j = i; j < puzzleArray.length; j++) {
+				if (puzzleArray[j] == 0) {
+					continue;
+				}
+
+				if (puzzleArray[j] < puzzleArray[i]) {
+					inversions++;
+				}
+			}
+		}
+
+		return inversions;
+	}
+
 
 }
