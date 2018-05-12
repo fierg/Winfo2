@@ -44,7 +44,7 @@ public class puzzleSolver {
 			printUsage();
 		}
 		puzzle = new Puzzle(tiles);
-		puzzle.printPuzzle("Solvable: " + puzzle.isSolvable()); //print once for the start state
+		//puzzle.printPuzzle("Solvable: " + puzzle.isSolvable()); //print once for the start state
 
 		try {
 			switch(Integer.parseInt(args[1])){
