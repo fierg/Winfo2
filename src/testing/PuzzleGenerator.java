@@ -1,4 +1,6 @@
-package puzzleSolver;
+package testing;
+
+import puzzleSolver.Puzzle;
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -253,5 +253,4 @@ public class Puzzle {
 		return inversions;
 	}
 
-
 }

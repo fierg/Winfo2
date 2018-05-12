@@ -1,8 +1,8 @@
 package puzzleSolver;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
+import testing.PuzzleGenerator;
+
+import java.util.*;
 
 /**
  * The Class puzzleSolver.
@@ -11,13 +11,6 @@ public class puzzleSolver {
 
 	/** The puzzle. */
 	private static Puzzle puzzle;
-
-	// Contains all visited Puzzlestates
-	private ArrayList<PuzzleNode> statesVisited = new ArrayList<>();
-	// contains all states that are still open and therefore have to be visited
-	private LinkedList<PuzzleNode> openStates = new LinkedList<>();
-	// contains the Puzzlestates from start to the solution
-	private ArrayList<Puzzle> solution = new ArrayList<>();
 
 	/**
 	 * The main method.
@@ -68,20 +61,22 @@ public class puzzleSolver {
 				printUsage();
 			}
 		} else {
+			System.exit(0);
 		}
 		// -------_Testing
+/*
 		PuzzleGenerator gen = new PuzzleGenerator();
 		puzzleSolver solver = new puzzleSolver();
 
-		for (Puzzle p : gen.generatePuzzleList(123, 50)) {
-			 isSolvable = p.isSolvable(p.puzzle, p.SOLUTION);
-			puzzle.printPuzzle("Solvable: " + isSolvable);
+		for (Puzzle p : gen.generatePuzzleList(123, 20)) {
+			isSolvable = p.isSolvable(p.puzzle, p.SOLUTION);
+			p.printPuzzle("Solvable: " + isSolvable);
 			if (isSolvable) {
 				solver.solve(p.copy(), 1, 0);
-				solver.solve(p.copy(), 2, 1);
+				solver.solve(p.copy(), 2, 0);
 				solver.solve(p.copy(), 3, 0);
 			}
-		}
+		}*/
 
 	}
 
@@ -105,8 +100,13 @@ public class puzzleSolver {
 		// nodes as children
 		ArrayList<PuzzleNode> children;
 
-		// initialize the solutionList
-		solution = new ArrayList<Puzzle>();
+		// Contains all visited Puzzlestates
+		ArrayList<PuzzleNode> statesVisited = new ArrayList<>();
+		// contains all states that are still open and therefore have to be visited
+		PriorityQueue<PuzzleNode> openStates = new PriorityQueue<PuzzleNode>();
+		// contains the Puzzlestates from start to the solution
+		ArrayList<Puzzle> solution = new ArrayList<>();
+
 		// initialize the currentState to null
 		PuzzleNode currentState = null;
 
@@ -119,7 +119,7 @@ public class puzzleSolver {
 
 		// Create PuzzleNode using start state and add it to the end of the open
 		// states
-		openStates.offer(new PuzzleNode(startState));
+		openStates.add(new PuzzleNode(startState));
 
 		// continue while we still have open states and the solution wasn't
 		// found
@@ -130,10 +130,12 @@ public class puzzleSolver {
 
 			if (printSteps == 1) {
 				// print the currently inspected state if we should:
-				currentState.puzzleState.printPuzzle(
-						"Current = " + nodeCounter + ", h(current) = " + currentState.puzzleState.wrongTiles());
-			}
+				if (currentState.gn > 20) {
+					currentState.puzzleState.printPuzzle(
+							"Current = " + nodeCounter + ", h(current) = " + currentState.hn, "g(current) = " + currentState.gn, "f(current) = " + currentState.fn);
 
+				}
+			}
 			// if isSolved() we can stop
 			if (currentState.puzzleState.isSolved()) {
 				solutionFound = true;
@@ -152,46 +154,20 @@ public class puzzleSolver {
 				PuzzleNode child = children.get(i);
 				stateVisited = false;
 
-				for (PuzzleNode vistedNode : statesVisited) {
-					// child has been visited, so break and continue with the
-					// next one:
-					if (child.equals(vistedNode)) {
-						stateVisited = true;
-						break;
-					}
+				if(openStates.contains(child) || statesVisited.contains(child)){
+					stateVisited = true;
 				}
 
-				for (PuzzleNode openNode : openStates) {
-					// child is already in the openList, so we don't need to add
-					// it again:
-					if (child.equals(openNode)) {
-						stateVisited = true;
-						break;
-					}
-				}
 
 				// else the child hasn't been visited yet:
 				if (stateVisited == false) {
-					boolean inserted = false;
-
 					// determine the score for the new found state:
 					child.determineScore(method);
 
 					// and add it in ascending order of the score, since we
 					// wan't to progress on the state with the
 					// lowest score next:
-					for (int j = 0; j < openStates.size(); j++) {
-						if (child.score < openStates.get(j).score) {
-							openStates.add(j, child); // insert right before a
-														// child that would have
-														// a higher score
-							inserted = true;
-							break;
-						}
-					}
-					// if it's the highest score yet, put it at the end:
-					if (inserted == false)
-						openStates.offer(child);
+					openStates.add(child);
 				}
 			}
 
@@ -220,7 +196,7 @@ public class puzzleSolver {
 			// p.printPuzzle();
 			// }
 			System.out.println(
-					"found a Solution with " + solution.size() + " moves, while expanding " + nodeCounter + " nodes");
+					"found a Solution with method " + method + ", " + (solution.size()-1) + " moves, while expanding " + nodeCounter + " nodes");
 		} else {
 			// Solution wasn't found
 			System.out.println("Could not find Solution :(");

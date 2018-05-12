@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * the herusticScore hn of the State
  * and a reference to the parent to reconstruct the solution path
  */
-public class PuzzleNode {
+public class PuzzleNode implements Comparable<PuzzleNode>{
     Puzzle puzzleState;
     int hn, fn, gn;
     int score;
@@ -55,8 +55,8 @@ public class PuzzleNode {
      * @param other the other node
      * @return true, if the puzzleStates are the same
      */
-    public boolean equals(PuzzleNode other) {
-        return this.puzzleState.equals(other.puzzleState);
+    public boolean equals(Object other) {
+        return this.puzzleState.equals(((PuzzleNode)other).puzzleState);
     }
 
     /**
@@ -66,9 +66,20 @@ public class PuzzleNode {
     public void determineScore(int method){
         switch(method){
             case 1: score = hn = puzzleState.wrongTiles(); break;
-            case 2: hn = puzzleState.wrongTiles(); score = fn = hn + gn; break;
-            case 3: hn = puzzleState.getH(); score = fn = hn + gn; break;
+            case 2: hn = puzzleState.wrongTiles(); score = hn + gn; fn = hn + gn; break;
+            case 3: hn = puzzleState.getH(); score = hn + gn; fn = hn + gn; break;
         }
     }
 
+    @Override
+    public int compareTo(PuzzleNode o) {
+        if(this.score > o.score){
+            return 1;
+        } else if ( this.score < o.score){
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    }
 }
