@@ -34,12 +34,12 @@ public class Puzzle {
 	}
 
 	/**
-	 * Prints the puzzle.
+	 * Prints the puzzle together with the given strings.
+	 * Each parameter gets printed in its own line
 	 *
-	 * @param functionValues the function values
+	 * @param strings all strings that should also be printed besides the puzzle
 	 */
-	// prints the puzzle to console and adds the given function+value strings
-	public void printPuzzle(String... functionValues) {
+	public void printPuzzle(String... strings) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < this.puzzle.length; i++) {
 			for (int j = 0; j < this.puzzle[i].length; j++) {
@@ -49,9 +49,9 @@ public class Puzzle {
 			sb.append("\n");
 		}
 
-		for (String s : functionValues) {
+		for (String s : strings) {
 			sb.append(s);
-			sb.append(" ");
+			sb.append("\n");
 		}
 		sb.append("\n");
 		sb.append("-----");
@@ -146,6 +146,11 @@ public class Puzzle {
 		return this.wrongTiles() == 0;
 	}
 
+	/**
+	 * An equals method which compares every single number in the puzzle
+	 * @param other the Puzzle to compare with
+	 * @return true if all tiles are at the same position
+	 */
 	public boolean equals(Puzzle other) {
 		boolean isEqual = true;
 		for(int i = 0; i < 3; i++){
@@ -159,6 +164,10 @@ public class Puzzle {
 		return isEqual;
 	}
 
+	/**
+	 * Creates a "real" copy of the puzzle, instead of only the references
+	 * @return a new Puzzle Object with the same tiles as the instance it was called on
+	 */
 	public Puzzle copy(){
 		int[][] tiles = new int[3][3];
 		for(int i = 0; i < 3; i++){
@@ -175,7 +184,7 @@ public class Puzzle {
 	 * @param solutionTile the solution tile
 	 * @return the int
 	 */
-	public int manhattanDist(int tile, int[][] puzzle, int solutionTile) {
+	private int manhattanDist(int tile, int[][] puzzle, int solutionTile) {
 		Point p1 = getPoint(tile, puzzle);
 		Point p2 = getPoint(solutionTile, SOLUTION);
 
@@ -205,7 +214,11 @@ public class Puzzle {
 		return null;
 	}
 
-	public int getH() {
+	/**
+	 * calculates the ManhattenDistance for each tile in the puzzle and returns the sum
+	 * @return the summed up manhattendistance of each tile
+	 */
+	public int getManhattanHeuristic() {
 		int sum = 0;
 		for (int[] is : puzzle) {
 			for (int i : is) {
@@ -214,18 +227,32 @@ public class Puzzle {
 		}
 		return sum;
 	}
-	
-	public boolean isSolvable(int[][] puzzle, int[][] solution) {
-		if ((countInversions(puzzle) % 2 == 0 && countInversions(solution) % 2 == 0)
-				|| ((countInversions(puzzle) + 1) % 2 == 0 && (countInversions(solution) + 1) % 2 == 0)) {
+
+	/**
+	 * calculates if the given puzzle is solvable in regard to the given solution
+	 * @param solution the solutionState which should be reachable
+	 * @return return true if the solution state can be reached by only moving one tile at a time
+	 */
+	public boolean isSolvable(int[][] solution) {
+		//this method works by comparing the number of inversions in the current puzzleState
+		// and the number of inversions in the solutionState
+		// If both inversions are even or both ar odd, the solutionState can be reached
+		if ((countInversions(this.puzzle) % 2 == 0 && countInversions(solution) % 2 == 0)
+				|| ((countInversions(this.puzzle) + 1) % 2 == 0 && (countInversions(solution) + 1) % 2 == 0)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public int countInversions(int[][] puzzle) {
+	/**
+	 * counts the inversions of the given puzzle
+	 * @param puzzle the puzzle to check the inversions of
+	 * @return the number of inversions in the puzzle
+	 */
+	public static int countInversions(int[][] puzzle) {
 		int inversions = 0;
+		// put all tiles in a one dimensional array for easy calculations:
 		ArrayList<Integer> puzzleList = new ArrayList<>();
 		for (int[] row : puzzle) {
 			for (int i : row) {
@@ -235,10 +262,11 @@ public class Puzzle {
 		Integer[] puzzleArray = puzzleList.toArray(new Integer[puzzleList.size()]);
 
 		for (int i = 0; i < puzzleArray.length; i++) {
+			// ignore the 0 tile
 			if (puzzleArray[i] == 0) {
 				continue;
 			}
-
+			// sum up any inversions appearing in the other tiles:
 			for (int j = i; j < puzzleArray.length; j++) {
 				if (puzzleArray[j] == 0) {
 					continue;
