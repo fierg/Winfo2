@@ -1,7 +1,5 @@
 package puzzleSolver;
 
-import testing.PuzzleGenerator;
-
 import java.util.*;
 
 /**
@@ -31,8 +29,7 @@ public class puzzleSolver {
 
 		// chheck args:
 		if (args.length != 3) {
-			printUsage();
-			return;
+			usage();
 		}
 		// Tokenize the Puzzle and generate it
 		StringTokenizer toki = new StringTokenizer(args[0], ",");
@@ -43,12 +40,18 @@ public class puzzleSolver {
 					tiles[i][j] = Integer.parseInt(toki.nextToken());
 				}
 			}
+			// check args:
 		} catch (NumberFormatException e) {
-			// check args
-			printUsage();
+			System.out.println("Please use numbers for the puzzle tiles!");
+			usage();
+		} catch (NoSuchElementException e){
+			System.out.println("Please specify 9 numbers for the tiles and separate them with ','");
+			usage();
+		} catch (Exception e){
+			usage();
 		}
 		puzzle = new Puzzle(tiles);
-		boolean isSolvable = puzzle.isSolvable(tiles, puzzle.SOLUTION);
+		boolean isSolvable = puzzle.isSolvable(Puzzle.SOLUTION);
 		puzzle.printPuzzle("Solvable: " + isSolvable); // print once for the
 														// start state
 
@@ -58,18 +61,20 @@ public class puzzleSolver {
 				solver.solve(puzzle, Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 			} catch (NumberFormatException e) {
 				// check args
-				printUsage();
+				usage();
 			}
 		} else {
 			System.exit(0);
 		}
-		// -------_Testing
-/*
+
+
+		// ----------Testing----------------
+		/*
 		PuzzleGenerator gen = new PuzzleGenerator();
 		puzzleSolver solver = new puzzleSolver();
 
 		for (Puzzle p : gen.generatePuzzleList(123, 20)) {
-			isSolvable = p.isSolvable(p.puzzle, p.SOLUTION);
+			isSolvable = p.isSolvable(p.SOLUTION);
 			p.printPuzzle("Solvable: " + isSolvable);
 			if (isSolvable) {
 				solver.solve(p.copy(), 1, 0);
@@ -121,8 +126,10 @@ public class puzzleSolver {
 		// states
 		openStates.add(new PuzzleNode(startState));
 
-		// continue while we still have open states and the solution wasn't
-		// found
+		// continue while we still have open states and the solution wasn't found
+		// start time measurement here
+		System.out.println("Starting to solve with method " + method);
+		long startTime = System.nanoTime();
 		while (!openStates.isEmpty() && solutionFound == false) {
 			// Retrieve and remove the first state and start the loop:
 			currentState = openStates.poll();
@@ -132,7 +139,7 @@ public class puzzleSolver {
 				// print the currently inspected state if we should:
 				if (currentState.gn > 20) {
 					currentState.puzzleState.printPuzzle(
-							"Current = " + nodeCounter + ", h(current) = " + currentState.hn, "g(current) = " + currentState.gn, "f(current) = " + currentState.fn);
+							"Current = " + nodeCounter + ", score(current) = " + currentState.score,"h(current) = " + currentState.hn, "g(current) = " + currentState.gn, "f(current) = " + currentState.fn);
 
 				}
 			}
@@ -150,17 +157,14 @@ public class puzzleSolver {
 			// now compare each child with the visitedList and openList, to see
 			// if we already visited or want to visit that exact state:
 			boolean stateVisited;
+			// iterate through the children
 			for (int i = 0; i < children.size(); i++) {
 				PuzzleNode child = children.get(i);
-				stateVisited = false;
 
+				// check if it already has been visited:
 				if(openStates.contains(child) || statesVisited.contains(child)){
-					stateVisited = true;
-				}
-
-
-				// else the child hasn't been visited yet:
-				if (stateVisited == false) {
+				} else {
+					// else the child hasn't been visited yet:
 					// determine the score for the new found state:
 					child.determineScore(method);
 
@@ -171,34 +175,43 @@ public class puzzleSolver {
 				}
 			}
 
-			// update the visited and open Lists acording to the currentState:
+			// update the visited and open Lists according to the currentState:
 			statesVisited.add(currentState);
 			openStates.remove(currentState);
 		}
 
+		// if the while-loop stopped, there are two possibilities
+		// The solution was found or all possible 9! States were checked and no solution was found
+		// (which shouldn't happen, since the "isSolvable()" Method has to yield true before the algorithm start)
+		// However just in case, check if the solution was found:
 		if (solutionFound == true) {
-			boolean pathFound = false;
+			// stop time here, since the algorithm already finished:
+			long elapsedTime = System.nanoTime() - startTime;
 			// to reproduce all steps from the start to the solution,
-			// we can just go from the Solution Node recursively to each parent
-			// and add the saved Puzzle to the SolutionList:
-			solution.add(currentState.puzzleState); // currentState still holds
-													// our solution, so begin
-													// here
+			// we can just go from the Solution Node to each parent
+			// and add the PuzzleStates to the SolutionList:
+			solution.add(currentState.puzzleState); // currentState still holds our solution, so begin here
+			boolean pathFound = false;
 			while (pathFound == false) {
 				currentState = currentState.parent;
 				// add all new states at the beginning, so we get the right
 				// order at the end:
 				solution.add(0, currentState.puzzleState);
 				if (currentState.puzzleState.equals(startState))
+					//startState has been reached, so we can stop:
 					pathFound = true;
 			}
-			// for(Puzzle p : solution){
-			// p.printPuzzle();
-			// }
+			//print the solution:
+			 for(Puzzle p : solution){
+			 	p.printPuzzle();
+			 }
+			 //print all information we gathered during the algorithm:
+			int minutes = (int)(elapsedTime/1000000000d) / 60;
+			double seconds = elapsedTime/1000000000d % 60;
 			System.out.println(
-					"found a Solution with method " + method + ", " + (solution.size()-1) + " moves, while expanding " + nodeCounter + " nodes");
+					"found a Solution with method " + method + ": " + (solution.size()-1) + " moves, while visiting " + nodeCounter + " nodes" + "\nIt took " + minutes + " minutes and " + seconds + " seconds");
 		} else {
-			// Solution wasn't found
+			// else print that the solution wasn't found
 			System.out.println("Could not find Solution :(");
 		}
 	}
@@ -206,9 +219,10 @@ public class puzzleSolver {
 	/**
 	 * Prints the usage.
 	 */
-	private static void printUsage() {
+	private static void usage() {
 		System.out.println(
 				"Usage: \"Das Puzzle durch Komma getrennt (1,2,3,4,...)\" \"Suchalgorithmus (1: greedy, 2: A* wrong tiles, 3: A* manhattan\" \"Ausgabe der Suchschritte 0:nein, 1:ja\"");
+		System.exit(0);
 	}
 
 }
