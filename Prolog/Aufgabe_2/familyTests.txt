@@ -1,0 +1,35 @@
+?- grossmutter_von(anna, bob).
+false.
+
+?- vorfahr_von(knut, ute).
+true 
+false.
+
+?- einzelkind(Einzelkind).
+Einzelkind = knut 
+Einzelkind = franz 
+Einzelkind = tim 
+Einzelkind = otto 
+Einzelkind = peter 
+Einzelkind = anton 
+Einzelkind = antonia 
+Einzelkind = ute 
+Einzelkind = maria.
+
+?- tante_von(Tante, NichteNeffe).
+Tante = inge,
+NichteNeffe = uschi 
+Tante = inge,
+NichteNeffe = bob 
+Tante = anna,
+NichteNeffe = tim 
+Tante = uschi,
+NichteNeffe = anton 
+Tante = maria,
+NichteNeffe = ute 
+false.
+
+?- tante_von(Tante_und_Grossmutter, _), grossmutter_von(Tante_und_Grossmutter, _).
+Tante_und_Grossmutter = anna 
+Tante_und_Grossmutter = anna 
+false.
