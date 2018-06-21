@@ -45,8 +45,8 @@ grossmutter_von(Oma, Enkelkind) :- mutter_von(Oma, Mutter), mutter_von(Mutter, E
 grossmutter_von(Oma, Enkelkind) :- mutter_von(Oma, Vater), vater_von(Vater, Enkelkind).
 grossvater_von(Opa, Enkelkind) :- partner_von(Opa, Oma), grossmutter_von(Oma, Enkelkind).
 
-cousine_von(Cousine, Person) :- weiblich(Cousine), grossmutter_von(Oma, Cousine), grossmutter_von(Oma, Person).
-cousin_von(Cousin, Person) :- maennlich(Cousin), grossmutter_von(Oma, Cousin), grossmutter_von(Oma, Person).
+cousine_von(Cousine, Person) :- weiblich(Cousine), grossmutter_von(Oma, Cousine), grossmutter_von(Oma, Person), Cousine\=Person, \+ schwester_von(Cousine, Person).
+cousin_von(Cousin, Person) :- maennlich(Cousin), grossmutter_von(Oma, Cousin), grossmutter_von(Oma, Person), Cousin\=Person, \+ bruder_von(Cousin, Person).
 
 vorfahr_von(Vorfahr, Person) :- mutter_von(Vorfahr, Person).
 vorfahr_von(Vorfahr, Person) :- vater_von(Vorfahr, Person).
